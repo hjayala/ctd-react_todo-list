@@ -1,44 +1,22 @@
 import './App.css';
-import TodoForm from './features/TodoForm';
-import TodoList from './features/TodoList/TodoList';
 import { useState } from 'react';
+import Header from './shared/Header';
+import Logon from './features/Logon';
+import TodosPage from './features/Todos/TodosPage';
 
 function App() {
-  const [todoList, setTodoList] = useState([]);
-
-  function addTodo(todoTitle) {
-    const newTodo = { id: Date.now(), title: todoTitle, isCompleted: false };
-    setTodoList(previous => [newTodo, ...previous]);
-  }
-
-  function completeTodo(id) {
-    const updatedList = todoList.map(todo => {
-      if (todo.id === id) {
-        return { ...todo, isCompleted: true };
-      }
-      return todo;
-    });
-    setTodoList(updatedList);
-  }
-
-  function updateTodo(editedTodo) {
-    const updatedTodos = todoList.map(todo =>
-      todo.id === editedTodo.id ? { ...editedTodo } : todo
-    );
-    setTodoList(updatedTodos);
-  }
+  // The underscore here lets React know email is left unused intentionally
+  // I had to add it, since it kept giving me an error until then
+  const [_email, setEmail] = useState('');
+  const [token, setToken] = useState('');
 
   return (
     <>
-      <div>
-        <h1>Hector Ayala's Todos</h1>
-        <TodoForm onAddTodo={addTodo} />
-        <TodoList
-          todoList={todoList}
-          onCompleteTodo={completeTodo}
-          onUpdateTodo={updateTodo}
-        />
-      </div>
+      <Header token={token} onSetToken={setToken} onSetEmail={setEmail} />
+      {token
+        ? <TodosPage token={token} />
+        : <Logon onSetEmail={setEmail} onSetToken={setToken} />
+      }
     </>
   );
 }
