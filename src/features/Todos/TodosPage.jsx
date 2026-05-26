@@ -74,7 +74,10 @@ function TodosPage({ token }) {
           'X-CSRF-TOKEN': token,
         },
         credentials: 'include',
-        body: JSON.stringify({ isCompleted: true }),
+        body: JSON.stringify({ 
+          isCompleted: true ,
+          createdAt: originalTodo.createdAt
+        }),
       });
       if (!response.ok) throw new Error('Failed to complete todo');
     } catch (err) {
@@ -101,6 +104,7 @@ function TodosPage({ token }) {
         body: JSON.stringify({
           title: editedTodo.title,
           isCompleted: editedTodo.isCompleted,
+          createdAt: originalTodo.createdAt
         }),
       });
       if (!response.ok) throw new Error('Failed to update todo');
