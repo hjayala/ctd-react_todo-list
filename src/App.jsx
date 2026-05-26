@@ -1,28 +1,24 @@
-import './App.css'
-import TodoForm from './TodoForm'
-import TodoList from './TodoList'
-import { useState } from 'react'
-
-const todos = [
-    {id:1, title: "Complete Scrimba React course"},
-    {id:2, title: "Take notes on Discrete Math"},
-    {id:3, title: "Review Data Structures"},
-]
+import './App.css';
+import { useState } from 'react';
+import Header from './shared/Header';
+import Logon from './features/Logon';
+import TodosPage from './features/Todos/TodosPage';
 
 function App() {
-  // The underscore here lets React now setTodoList is left unused intentionally
+  // The underscore here lets React know email is left unused intentionally
   // I had to add it, since it kept giving me an error until then
-  const [todoList, _setTodoList] = useState(todos)
+  const [_email, setEmail] = useState('');
+  const [token, setToken] = useState('');
 
   return (
     <>
-      <div>
-        <h1>Hector Ayala's Todos</h1>
-        <TodoForm />
-        <TodoList todoList={todoList} />
-      </div>
+      <Header token={token} onSetToken={setToken} onSetEmail={setEmail} />
+      {token
+        ? <TodosPage token={token} />
+        : <Logon onSetEmail={setEmail} onSetToken={setToken} />
+      }
     </>
-  )
+  );
 }
 
-export default App
+export default App;
