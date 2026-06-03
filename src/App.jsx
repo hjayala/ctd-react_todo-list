@@ -1,22 +1,16 @@
 import './App.css';
-import { useState } from 'react';
 import Header from './shared/Header';
 import Logon from './features/Logon';
 import TodosPage from './features/Todos/TodosPage';
+import { useAuth } from './contexts/AuthContext';
 
 function App() {
-  // The underscore here lets React know email is left unused intentionally
-  // I had to add it, since it kept giving me an error until then
-  const [_email, setEmail] = useState('');
-  const [token, setToken] = useState('');
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
-      <Header token={token} onSetToken={setToken} onSetEmail={setEmail} />
-      {token
-        ? <TodosPage token={token} />
-        : <Logon onSetEmail={setEmail} onSetToken={setToken} />
-      }
+      <Header />
+      {isAuthenticated ? <TodosPage /> : <Logon />}
     </>
   );
 }
