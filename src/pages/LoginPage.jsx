@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 
-function Logon() {
-  const { login } = useAuth();
+function LoginPage() {
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || '/todos';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isLoggingOn, setIsLoggingOn] = useState(false);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
     setIsLoggingOn(true);
     const result = await login(email, password);
     if (!result.success) {
@@ -43,11 +55,11 @@ function Logon() {
           />
         </div>
         <button type="submit" disabled={isLoggingOn}>
-          {isLoggingOn ? 'Logging in...' : 'Log On'}
+          {isLoggingOn ? 'Logging in...' : 'Log In'}
         </button>
       </form>
     </div>
   );
 }
 
-export default Logon;
+export default LoginPage;

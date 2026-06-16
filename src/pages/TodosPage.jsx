@@ -1,18 +1,21 @@
 import { useEffect, useReducer } from 'react';
-import TodoForm from './TodoForm';
-import TodoList from './TodoList/TodoList';
-import SortBy from '../../shared/SortBy';
-import FilterInput from '../../shared/FilterInput';
-import useDebounce from '../../utils/useDebounce';
-import { useAuth } from '../../contexts/AuthContext';
+import { useSearchParams } from 'react-router';
+import TodoForm from '../features/Todos/TodoForm';
+import TodoList from '../features/Todos/TodoList/TodoList';
+import SortBy from '../shared/SortBy';
+import FilterInput from '../shared/FilterInput';
+import StatusFilter from '../shared/StatusFilter';
+import useDebounce from '../utils/useDebounce';
+import { useAuth } from '../contexts/AuthContext';
 import {
   todoReducer,
   initialTodoState,
   TODO_ACTIONS,
-} from '../../reducers/todoReducer';
+} from '../reducers/todoReducer';
 
 function TodosPage() {
   const { token } = useAuth();
+  const [searchParams] = useSearchParams();
   const [state, dispatch] = useReducer(todoReducer, initialTodoState);
   const {
     todoList,
@@ -25,6 +28,7 @@ function TodosPage() {
     dataVersion,
   } = state;
 
+  const statusFilter = searchParams.get('status') || 'all';
   const debouncedFilterTerm = useDebounce(filterTerm, 300);
 
   const handleFilterChange = (newTerm) => {
@@ -80,7 +84,7 @@ function TodosPage() {
 
   async function addTodo(todoTitle) {
     const tempId = Date.now();
-    const newTodo = { id: tempId, title: todoTitle, isCompleted: false };
+    const newTodo = { id: tempId, title: todoTitle, isCompleted: false, isPending: true };
     dispatch({ type: TODO_ACTIONS.ADD_TODO_START, payload: { newTodo } });
     try {
       const response = await fetch('/api/tasks', {
@@ -117,12 +121,7 @@ function TodosPage() {
           'X-CSRF-TOKEN': token,
         },
         credentials: 'include',
-        body: JSON.stringify({
-          isCompleted: true,
-          // the AI Review originally told me to add this, but this actually broke todos,
-          // so I'm commenting it out:
-          // createdAt: originalTodo.createdAt
-        }),
+        body: JSON.stringify({ isCompleted: true }),
       });
       if (!response.ok) throw new Error('Failed to complete todo');
       dispatch({ type: TODO_ACTIONS.COMPLETE_TODO_SUCCESS });
@@ -148,9 +147,6 @@ function TodosPage() {
         body: JSON.stringify({
           title: editedTodo.title,
           isCompleted: editedTodo.isCompleted,
-          // the AI Review originally told me to add this, but this actually broke todos,
-          // so I'm commenting it out:
-          // createdAt: originalTodo.createdAt
         }),
       });
       if (!response.ok) throw new Error('Failed to update todo');
@@ -210,6 +206,7 @@ function TodosPage() {
           })
         }
       />
+      <StatusFilter />
       <FilterInput filterTerm={filterTerm} onFilterChange={handleFilterChange} />
       <TodoForm onAddTodo={addTodo} />
       <TodoList
@@ -217,6 +214,7 @@ function TodosPage() {
         onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
         dataVersion={dataVersion}
+        statusFilter={statusFilter}
       />
     </div>
   );

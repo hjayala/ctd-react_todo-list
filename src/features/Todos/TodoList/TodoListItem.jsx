@@ -50,6 +50,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
                 type="checkbox"
                 checked={todo.isCompleted}
                 onChange={() => onCompleteTodo(todo.id)}
+                disabled={todo.isPending}
               />
             </label>
             <span onClick={() => setIsEditing(true)}>{todo.title}</span>
