@@ -6,8 +6,7 @@ I actually started this class in a previous cohort but had to defer for various 
 
 ## Live Demo
 
-<!-- TODO: Replace with the live Vercel URL once deployed -->
-_Coming soon — deployment pending._
+![Live Demo](https://ctd-react-todo-list.vercel.app/)
 
 ## Screenshots
 
