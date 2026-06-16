@@ -12,6 +12,9 @@ import {
   initialTodoState,
   TODO_ACTIONS,
 } from '../reducers/todoReducer';
+import styles from './TodosPage.module.css';
+import controlStyles from '../shared/controls.module.css';
+import { sanitizeTodoTitle } from '../utils/todoValidation';
 
 function TodosPage() {
   const { token } = useAuth();
@@ -83,8 +86,9 @@ function TodosPage() {
   }, [token, sortBy, sortDirection, debouncedFilterTerm]);
 
   async function addTodo(todoTitle) {
+    const cleanTitle = sanitizeTodoTitle(todoTitle);
     const tempId = Date.now();
-    const newTodo = { id: tempId, title: todoTitle, isCompleted: false, isPending: true };
+    const newTodo = { id: tempId, title: cleanTitle, isCompleted: false, isPending: true };
     dispatch({ type: TODO_ACTIONS.ADD_TODO_START, payload: { newTodo } });
     try {
       const response = await fetch('/api/tasks', {
@@ -94,7 +98,7 @@ function TodosPage() {
           'X-CSRF-TOKEN': token,
         },
         credentials: 'include',
-        body: JSON.stringify({ title: todoTitle, isCompleted: false }),
+        body: JSON.stringify({ title: cleanTitle, isCompleted: false }),
       });
       if (!response.ok) throw new Error('Failed to add todo');
       const savedTodo = await response.json();
@@ -110,7 +114,7 @@ function TodosPage() {
     }
   }
 
-  async function completeTodo(id) {
+  async function toggleTodo(id) {
     const originalTodo = todoList.find(todo => todo.id === id);
     dispatch({ type: TODO_ACTIONS.COMPLETE_TODO_START, payload: { id } });
     try {
@@ -121,9 +125,9 @@ function TodosPage() {
           'X-CSRF-TOKEN': token,
         },
         credentials: 'include',
-        body: JSON.stringify({ isCompleted: true }),
+        body: JSON.stringify({ isCompleted: !originalTodo.isCompleted }),
       });
-      if (!response.ok) throw new Error('Failed to complete todo');
+      if (!response.ok) throw new Error('Failed to update todo');
       dispatch({ type: TODO_ACTIONS.COMPLETE_TODO_SUCCESS });
     } catch (err) {
       dispatch({
@@ -134,10 +138,12 @@ function TodosPage() {
   }
 
   async function updateTodo(editedTodo) {
-    const originalTodo = todoList.find(todo => todo.id === editedTodo.id);
-    dispatch({ type: TODO_ACTIONS.UPDATE_TODO_START, payload: { editedTodo } });
+    const cleanTitle = sanitizeTodoTitle(editedTodo.title);
+    const sanitizedTodo = { ...editedTodo, title: cleanTitle };
+    const originalTodo = todoList.find(todo => todo.id === sanitizedTodo.id);
+    dispatch({ type: TODO_ACTIONS.UPDATE_TODO_START, payload: { editedTodo: sanitizedTodo } });
     try {
-      const response = await fetch(`/api/tasks/${editedTodo.id}`, {
+      const response = await fetch(`/api/tasks/${sanitizedTodo.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -145,8 +151,8 @@ function TodosPage() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          title: editedTodo.title,
-          isCompleted: editedTodo.isCompleted,
+          title: sanitizedTodo.title,
+          isCompleted: sanitizedTodo.isCompleted,
         }),
       });
       if (!response.ok) throw new Error('Failed to update todo');
@@ -160,58 +166,63 @@ function TodosPage() {
   }
 
   return (
-    <div>
+    <div className={styles.page}>
       {error && (
-        <div>
+        <div className={styles.errorBox}>
           <p>{error}</p>
           <button
             type="button"
             onClick={() => dispatch({ type: TODO_ACTIONS.CLEAR_ERROR })}
+            className={styles.errorButton}
           >
             Clear Error
           </button>
         </div>
       )}
       {filterError && (
-        <div>
+        <div className={styles.errorBox}>
           <p>{filterError}</p>
           <button
             type="button"
             onClick={() => dispatch({ type: TODO_ACTIONS.CLEAR_FILTER_ERROR })}
+            className={styles.errorButton}
           >
             Clear Filter Error
           </button>
           <button
             type="button"
             onClick={() => dispatch({ type: TODO_ACTIONS.RESET_FILTERS })}
+            className={styles.errorButton}
           >
             Reset Filters
           </button>
         </div>
       )}
-      {isTodoListLoading && <p>Loading todos...</p>}
-      <SortBy
-        sortBy={sortBy}
-        sortDirection={sortDirection}
-        onSortByChange={(newSortBy) =>
-          dispatch({
-            type: TODO_ACTIONS.SET_SORT,
-            payload: { sortBy: newSortBy, sortDirection },
-          })
-        }
-        onSortDirectionChange={(newDirection) =>
-          dispatch({
-            type: TODO_ACTIONS.SET_SORT,
-            payload: { sortBy, sortDirection: newDirection },
-          })
-        }
-      />
-      <StatusFilter />
-      <FilterInput filterTerm={filterTerm} onFilterChange={handleFilterChange} />
+      {isTodoListLoading && <p className={styles.loading}>Loading todos...</p>}
+      <div className={controlStyles.controlsBar}>
+        <SortBy
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortByChange={(newSortBy) =>
+            dispatch({
+              type: TODO_ACTIONS.SET_SORT,
+              payload: { sortBy: newSortBy, sortDirection },
+            })
+          }
+          onSortDirectionChange={(newDirection) =>
+            dispatch({
+              type: TODO_ACTIONS.SET_SORT,
+              payload: { sortBy, sortDirection: newDirection },
+            })
+          }
+        />
+        <StatusFilter />
+        <FilterInput filterTerm={filterTerm} onFilterChange={handleFilterChange} />
+      </div>
       <TodoForm onAddTodo={addTodo} />
       <TodoList
         todoList={todoList}
-        onCompleteTodo={completeTodo}
+        onCompleteTodo={toggleTodo}
         onUpdateTodo={updateTodo}
         dataVersion={dataVersion}
         statusFilter={statusFilter}
