@@ -89,7 +89,7 @@ export const TODO_ACTIONS = {
           ...state,
           todoList: state.todoList.map(todo =>
             todo.id === action.payload.id
-              ? { ...todo, isCompleted: true }
+              ? { ...todo, isCompleted: !todo.isCompleted }
               : todo
           ),
         };

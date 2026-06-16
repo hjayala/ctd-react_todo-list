@@ -1,0 +1,149 @@
+.item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  
+.item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* --- Custom checkbox --- */
+/* The real checkbox is visually hidden but stays in the DOM for
+    accessibility and keyboard use. The visible box is drawn next to it. */
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox {
+  /* Visually hide the native checkbox without removing it from the
+      accessibility tree (screen readers and keyboard still work) */
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkboxBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Checkmark, hidden by default */
+.checkboxBox::after {
+  content: '';
+  width: 6px;
+  height: 11px;
+  border: solid var(--color-text);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+  margin-bottom: 2px;
+}
+
+/* When the hidden checkbox is checked, fill the box and show the check */
+.checkbox:checked + .checkboxBox {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.checkbox:checked + .checkboxBox::after {
+  transform: rotate(45deg) scale(1);
+}
+
+/* Keyboard focus ring on the custom box */
+.checkbox:focus-visible + .checkboxBox {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.checkbox:disabled + .checkboxBox {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Title --- */
+.title {
+  flex: 1;
+  cursor: pointer;
+  padding: var(--space-xs) 0;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.titleCompleted {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+/* --- Edit mode --- */
+.editGroup {
+  flex: 1;
+}
+
+.editButtons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.cancelButton,
+.updateButton {
+  padding: var(--space-xs) var(--space-md);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+}
+
+.cancelButton {
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.cancelButton:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.updateButton {
+  background-color: var(--color-accent);
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+
+.updateButton:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.updateButton:disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-muted);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.fieldError {
+  margin: var(--space-xs) 0 0;
+  font-size: 0.8rem;
+  color: var(--color-error);
+}

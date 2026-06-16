@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import TodoListItem from './TodoListItem.jsx';
+import styles from './TodoList.module.css';
 
 function TodoList({
   todoList,
@@ -9,10 +10,6 @@ function TodoList({
   statusFilter = 'active',
 }) {
   const filteredTodoList = useMemo(() => {
-    console.log(
-      `Recalculating filtered todos (v${dataVersion}) - Status: ${statusFilter}`
-    );
-
     let filteredTodos;
     switch (statusFilter) {
       case 'completed':
@@ -26,7 +23,6 @@ function TodoList({
         filteredTodos = todoList;
         break;
     }
-
     return {
       version: dataVersion,
       todos: filteredTodos,
@@ -46,9 +42,9 @@ function TodoList({
   };
 
   return filteredTodoList.todos.length === 0 ? (
-    <p>{getEmptyMessage()}</p>
+    <p className={styles.emptyState}>{getEmptyMessage()}</p>
   ) : (
-    <ul>
+    <ul className={styles.list}>
       {filteredTodoList.todos.map((todo) => (
         <TodoListItem
           key={todo.id}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
+import styles from './Logoff.module.css';
 
 function Logoff() {
   const { logout } = useAuth();
@@ -11,9 +12,7 @@ function Logoff() {
   async function handleLogoff() {
     setIsLoggingOff(true);
     setError('');
-
     const result = await logout();
-
     if (result.success) {
       navigate('/login');
     } else {
@@ -24,8 +23,13 @@ function Logoff() {
 
   return (
     <>
-      {error && <p>{error}</p>}
-      <button type="button" onClick={handleLogoff} disabled={isLoggingOff}>
+      {error && <p className={styles.error}>{error}</p>}
+      <button
+        type="button"
+        onClick={handleLogoff}
+        disabled={isLoggingOff}
+        className={styles.logoffButton}
+      >
         {isLoggingOff ? 'Logging out...' : 'Log Out'}
       </button>
     </>
