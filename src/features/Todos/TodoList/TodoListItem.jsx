@@ -6,7 +6,7 @@ import {
 } from '../../../utils/todoValidation';
 import styles from './TodoListItem.module.css';
 
-function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
+function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
   const [isEditing, setIsEditing] = useState(false);
   const [workingTitle, setWorkingTitle] = useState(todo.title);
 
@@ -27,6 +27,12 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
     if (!isValidTodoTitle(workingTitle)) return;
     onUpdateTodo({ ...todo, title: workingTitle });
     setIsEditing(false);
+  }
+
+  function handleDelete() {
+    if (window.confirm('Are you sure you want to delete this todo?')) {
+      onDeleteTodo(todo.id);
+    }
   }
 
   return (
@@ -85,6 +91,15 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo }) {
             >
               {todo.title}
             </span>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className={styles.deleteButton}
+              disabled={todo.isPending}
+              aria-label="Delete todo"
+            >
+              Delete
+            </button>
           </>
         )}
       </form>

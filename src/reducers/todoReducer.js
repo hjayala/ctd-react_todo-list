@@ -10,6 +10,10 @@ export const TODO_ACTIONS = {
     COMPLETE_TODO_START: 'COMPLETE_TODO_START',
     COMPLETE_TODO_SUCCESS: 'COMPLETE_TODO_SUCCESS',
     COMPLETE_TODO_ERROR: 'COMPLETE_TODO_ERROR',
+
+    DELETE_TODO_START: 'DELETE_TODO_START',
+    DELETE_TODO_SUCCESS: 'DELETE_TODO_SUCCESS',
+    DELETE_TODO_ERROR: 'DELETE_TODO_ERROR',
   
     UPDATE_TODO_START: 'UPDATE_TODO_START',
     UPDATE_TODO_SUCCESS: 'UPDATE_TODO_SUCCESS',
@@ -27,7 +31,7 @@ export const TODO_ACTIONS = {
     error: '',
     filterError: '',
     isTodoListLoading: true,
-    sortBy: 'creationDate',
+    sortBy: 'createdAt',
     sortDirection: 'desc',
     filterTerm: '',
     dataVersion: 0,
@@ -108,6 +112,29 @@ export const TODO_ACTIONS = {
           ),
           error: action.payload.message,
         };
+
+      case TODO_ACTIONS.DELETE_TODO_START:
+        return {
+          ...state,
+          todoList: state.todoList.filter(
+            todo => todo.id !== action.payload.id
+          ),
+        };
+
+      case TODO_ACTIONS.DELETE_TODO_SUCCESS:
+        return {
+          ...state,
+          dataVersion: state.dataVersion + 1,
+        };
+
+      case TODO_ACTIONS.DELETE_TODO_ERROR:
+        return {
+          ...state,
+          todoList: [...state.todoList, action.payload.originalTodo].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          ),
+          error: action.payload.message,
+        };
   
       case TODO_ACTIONS.UPDATE_TODO_START:
         return {
@@ -165,7 +192,7 @@ export const TODO_ACTIONS = {
         return {
           ...state,
           filterTerm: '',
-          sortBy: 'creationDate',
+          sortBy: 'createdAt',
           sortDirection: 'desc',
           filterError: '',
         };
