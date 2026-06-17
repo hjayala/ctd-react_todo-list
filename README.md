@@ -8,6 +8,8 @@ I actually started this class in a previous cohort but had to defer for various 
 
 ![Live Demo](https://ctd-react-todo-list.vercel.app/)
 
+![Video Demo](https://www.youtube.com/watch?v=WNbEhN3_1Bw)
+
 ## Screenshots
 
 ![Todos page on desktop](./assets/screenshots/desktop.png)
